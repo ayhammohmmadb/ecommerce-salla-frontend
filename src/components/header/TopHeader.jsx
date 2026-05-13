@@ -6,6 +6,7 @@ import { FaSearch } from "react-icons/fa";
 import { CiHeart } from "react-icons/ci";
 import { FaOpencart } from "react-icons/fa";
 import { CartContext } from '../context/CartContext';
+import SearchBox from './SearchBox';
 const TopHeader = () => {
     const {CartItems} = useContext(CartContext);
   return (
@@ -14,11 +15,7 @@ const TopHeader = () => {
        <div className="container">
         <Link to="/" className='logo'><img src={logo} alt="" />
         <h1 className='logo-name'>salla</h1></Link>
-        <form action="" className="search_box">
-            <input type="text" name="" id="search" className="search" placeholder="Search For Products" />
-            <button type="submit"><FaSearch />
-</button>
-        </form>
+       <SearchBox />
         <div className="header_icons">
             <div className="icon">
                 <CiHeart />

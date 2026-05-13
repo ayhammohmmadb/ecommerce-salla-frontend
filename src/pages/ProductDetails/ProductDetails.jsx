@@ -3,20 +3,64 @@ import { useParams } from "react-router-dom";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import './productDetails.css'
-import { CiShoppingCart } from "react-icons/ci";
-import { CiHeart } from "react-icons/ci";
-import { FaShare } from "react-icons/fa";
+
 import SlideProduct from '../../components/slideProducts/SlideProduct';
 import { CartContext } from '../../components/context/CartContext';
+import { Link } from 'react-router-dom';
+import toast from 'react-hot-toast';
+import ProductImags from './ProductImage';
+import DetailsItem from './DetailsItem';
 
 const ProductDetails = () => {
 const { CartItems, addToCart } = useContext(CartContext);
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
-useEffect(() => {
+
+    useEffect(() => {
   console.log("Cart updated:", CartItems);
 }, [CartItems]);
 
+    const renderStars = (rating) => {
+  return [...Array(5)].map((_, index) => {
+    const starValue = index + 1;
+
+    if (rating >= starValue) {
+      return <FaStar key={index} />;
+    } else if (rating >= starValue - 0.5) {
+      return <FaStarHalfAlt key={index} />;
+    } else {
+      return <FaRegStar key={index} />;
+    }
+  });
+};
+const handeladdTOCart=(product)=>{
+  addToCart(product);
+  toast.success(
+    <div className='toast_wrapper'>
+       <img src={product.images[0]} alt={product.title}  className='toast_img'/>
+       <div className="toast_content">
+        <strong>
+          {product.title} added to cart!
+        </strong>
+        <div>
+          <button className="btn"><Link to="/cart">View Cart</Link></button>
+        </div>
+       </div>
+    </div>
+    ,
+    {
+      duration: 5000,
+      style: {
+        border: '1px solid #333',
+        padding: '16px',
+        color: '#333',
+      },
+      
+      },
+    
+    
+  );
+}
   const { id } = useParams();
 
   useEffect(() => {
@@ -38,68 +82,26 @@ useEffect(() => {
     fetchProduct();
 
   }, [id]);
-
-  const renderStars = (rating) => {
-  return [...Array(5)].map((_, index) => {
-    const starValue = index + 1;
-
-    if (rating >= starValue) {
-      return <FaStar key={index} />;
-    } else if (rating >= starValue - 0.5) {
-      return <FaStarHalfAlt key={index} />;
-    } else {
-      return <FaRegStar key={index} />;
-    }
-  });
-};
-  if (loading) {
-    return (
-      <div className="loader">
-        <AiOutlineLoading3Quarters className="spin" />
-      </div>
-    )
-  }
-
-  if (!product) {
-    return <AiOutlineLoading3Quarters />
-  }
-
+if (loading) {
+  return (
+    <div className="loading">
+      <AiOutlineLoading3Quarters className='spin' />
+    </div>
+  )
+}
+  
+     const inCart=CartItems.some(i=>i.id===product.id)
   return (
     <div className="items">
  <div className="item_details">
       <div className="container">
-        <div className="imgs_item">
-          <div className="big_img">
-            <img id='big_img' src={product.images[0]} alt="item" />
-          </div>
-          <div className="sm_img">
-          {product.images.map((image, index) => (
-              <img
-                src={image}
-                alt="item"
-                key={index}
-                className={index === 0 ? "active" : ""}
-                onClick={()=>{document.getElementById("big_img").src=image}}
-              />
-            ))}
-          </div>
-        </div>
-        <div className="details_item">
-          <h1 className="name">{product.title}</h1>
-          <div className="stars">{renderStars(product.rating)}</div>
-          <p className="price">${product.price}</p>
-          <h5 >Availability : <span>{product.availabilityStatus}</span></h5>
-          <h5 >Brand :<span>{product.brand}</span></h5>
-             <p className="desc">{product.description}</p>
-          <h5 className='stock'>Hurry Up ! Only {product.stock} Products left in stock.   </h5>
-       
-          <button className="btn" >Add To Cart  <CiShoppingCart className='shps' /> </button>
-           <div className="icons">
-                  <CiShoppingCart className='shop'  onClick={() =>addToCart(product)}/>
-                  <CiHeart  className='heart'/>
-                  <FaShare className='share' />
-                </div>
-        </div>
+       <ProductImags product={product} />
+        <DetailsItem 
+          product={product} 
+          renderStars={renderStars} 
+          handeladdTOCart={handeladdTOCart} 
+          inCart={inCart} 
+        />
       </div>
     
     </div>
